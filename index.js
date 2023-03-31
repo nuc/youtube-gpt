@@ -35,6 +35,7 @@ if (!OPENAI_API_KEY) {
 }
 
 const videoId = new URL(YOUTUBE_URL).searchParams.get('v');
+let videoTitle
 
 async function download(url) {
   try {
@@ -42,6 +43,10 @@ async function download(url) {
     if (!fs.existsSync(TMP_DOWNLOADS)) {
       fs.mkdirSync(TMP_DOWNLOADS);
     }
+    // Get basic info of the video including title
+    const videoInfo = await ytdl.getBasicInfo(url);
+    videoTitle = videoInfo.videoDetails.title;
+
     const audioPath = path.join(TMP_DOWNLOADS, `${videoId}.mp3`);
     if (fs.existsSync(audioPath)) {
       logger('Audio already exists, skipping download');
@@ -158,7 +163,7 @@ async function uploadFileAndTranscribe(fileBuffer) {
   }
 }
 
-async function saveTranscription(id, transcript, tokenCount, summarizedChunks) {
+async function saveTranscription(id, title, transcript, tokenCount, summarizedChunks) {
   logger('Saving transcription to file...');
   let transcriptions = {};
 
@@ -167,7 +172,7 @@ async function saveTranscription(id, transcript, tokenCount, summarizedChunks) {
     transcriptions = JSON.parse(fileContent);
   }
 
-  transcriptions[id] = { transcript, tokenCount, summarizedChunks };
+  transcriptions[id] = { title, transcript, tokenCount, summarizedChunks };
   fs.writeFileSync(JSON_FILE, JSON.stringify(transcriptions, null, 2));
 }
 
@@ -276,8 +281,10 @@ async function splitTranscript(transcript, maxTokens) {
   return chunks;
 }
 
-const logResponse = ({ YOUTUBE_URL, QUESTION, answer }) => {
+const logResponse = ({ title, QUESTION, answer }) => {
   const response = `---------------------------
+  VIDEO: ${title}
+  ---------------------------
   QUESTION: ${QUESTION}
   ---------------------------
   ANSWER: ${answer}
@@ -310,11 +317,11 @@ const run = async () => {
       }
     }
 
-    transcriptData = { transcript: fullTranscript, tokenCount, summarizedChunks };
-    saveTranscription(videoId, fullTranscript, tokenCount, summarizedChunks);
+    transcriptData = { title: videoTitle, transcript: fullTranscript, tokenCount, summarizedChunks };
+    saveTranscription(videoId, videoTitle, fullTranscript, tokenCount, summarizedChunks);
   }
 
-  const { transcript, tokenCount, summarizedChunks } = transcriptData;
+  const { title, transcript, tokenCount, summarizedChunks } = transcriptData;
 
   let answer = await findExistingAnswer(videoId, QUESTION);
 
@@ -331,7 +338,7 @@ const run = async () => {
   } else {
     logger('Existing Answer:', answer);
   }
-  logResponse({ YOUTUBE_URL, QUESTION, answer });
+  logResponse({ title, YOUTUBE_URL, QUESTION, answer });
 };
 
 run();

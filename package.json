@@ -10,7 +10,7 @@
     "media-split": "^5.4.0",
     "ora": "^6.3.0",
     "word-wrap": "^1.2.3",
-    "ytdl-core": "^4.11.2"
+    "ytdl-core": "^4.11.3"
   },
   "bin": {
     "youtube-gpt": "./index.js"
