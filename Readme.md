@@ -2,6 +2,8 @@
 
 This is a fun and easy-to-use module that downloads and transcribes YouTube videos, and then uses OpenAI's GPT-4 model to answer questions about the video content. It's perfect for when you want to get a quick summary or answer specific questions about a video without watching the whole thing.
 
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/697014/229181087-5cecf0f8-4c96-4a57-9c2b-766a0537712b.png">
+
 **Note**: This project uses the GPT-4 model, which requires access to that model through the OpenAI API. Make sure your OpenAI account has access to GPT-4 before using this project.
 
 **Created with the help of GPT-4**: The code and this README were generated also with the assistance of OpenAI's GPT-4 model.
