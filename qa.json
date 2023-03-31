@@ -20,5 +20,15 @@
       "question": "Please summarize the video",
       "answer": "In this video, Lex Fridman and Sam Altman discuss the potential of large language models like GPT-3 in achieving artificial general intelligence (AGI). They explore the idea that while GPT-3 has achieved impressive results, it may still require additional components or ideas to reach AGI. Sam Altman emphasizes that he would like to see a system that can significantly contribute to scientific knowledge and discovery.\n\nThey also discuss the impact of AI on programming and how it can make humans more productive, rather than replacing them. They touch on the idea that humans will still seek drama, imperfections, and status, even in a world where AI has greatly improved the quality of life."
     }
+  ],
+  "3eEffbjzNwE": [
+    {
+      "question": "Please summarize the video",
+      "answer": "In the video, David Deutsch discusses the concept of explanation and its importance in understanding reality and the future of humanity. He differentiates between good explanations and bad explanations, stating that good explanations are hard to vary while still explaining what they purport to explain. Bad explanations, on the other hand, can be false or simply inadequate.\n\nDeutsch argues that reductionism, the idea that explanations must be built from the ground up, is a prejudice and that good explanations can come from different modes or levels of understanding. He also introduces the concept of bad philosophy, which is a subset of bad explanations that hinder the growth of knowledge by closing off certain areas of inquiry. Examples of bad philosophy include logical positivism and certain statistical analyses in physics.\n\nThe antidote to bad philosophy, according to Deutsch, is the quest for good explanations that apply across various fields, including science, philosophy, politics, and aesthetics. This principle allows for progress and the growth of knowledge."
+    },
+    {
+      "question": "Who is David Deutsch?",
+      "answer": "David Deutsch is a British physicist, philosopher, and author, born in 1953 in Haifa, Israel. He is best known for his pioneering work in the field of quantum computation and his contributions to the understanding of quantum mechanics. Deutsch is a visiting professor at the University of Oxford's Centre for Quantum Computation and a Fellow of the Royal Society.\n\nDeutsch has written two influential books, \"The Fabric of Reality\" (1997) and \"The Beginning of Infinity\" (2011), in which he explores the nature of reality, knowledge, and the potential for human progress. His work spans various disciplines, including physics, philosophy, computer science, and even biology, as he seeks to understand the fundamental principles that govern our universe and the growth of knowledge."
+    }
   ]
 }
