@@ -26,21 +26,18 @@ You'll also need to set up an OpenAI API key. You can get one by signing up for 
 To use the script without installing it locally, you can run the following command, replacing the YouTube URL and question with your desired values:
 
 ```bash
-OPENAI_API_KEY=your-openai-api-key-here npx youtube-gpt 'https://www.youtube.com/watch?v=ylpAHvPlafc' 'Please summarize the video'
+npx youtube-gpt 'https://www.youtube.com/watch?v=ylpAHvPlafc'
 ```
 
-That should give you:
-```
-The video is a "Before You Buy" review of The Last of Us Part 1 on PC. The reviewer, Jake, shares his first impressions and discusses the performance issues that many players have experienced with the game. He mentions that the game has received mostly negative reviews on Steam due to these issues.
+Please make sure that you provide your OpenAI API key as a variable:
 
-Jake explains that despite meeting the recommended specs, they had a hard time getting the game to run smoothly at 1440p and close to 60 FPS. They encountered stuttering, inconsistent frame rates, and long load times. The game also takes up a significant amount of VRAM and has some strange default settings, such as an excessive film grain effect.
-
-The Last of Us Part 1 on PC has a good amount of options and features, but it seems poorly optimized. Jake mentions that the community is working on homemade fixes, but he believes that the game should work properly without needing these fixes. He also briefly discusses the game's performance on the Steam Deck, which resulted in crashes.
-
-In conclusion, Jake recommends waiting to purchase The Last of Us Part 1 on PC until the performance issues are resolved. He hopes that the game will eventually become a definitive version for PC players and that the community will be able to mod and enjoy the game as intended.
+```bash
+export OPENAI_API_KEY=your-openai-api-key-here
 ```
 
 The script will download the YouTube video, transcribe it, and ask GPT-4 your question. The transcription, question, and GPT-4's answer will be saved in JSON files for future reference.
+
+After the YouTube URL, you can provide your own question. Otherwise it will use the default one, for summarizing the video.
 
 ## Local development
 
