@@ -7,14 +7,19 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 const { Readable } = require('stream');
+const { encode, decode } = require('gpt-3-encoder');
+const path = require('path');
 
 const YOUTUBE_URL = process.argv[2];
 const QUESTION = process.argv[3] || 'Please summarize the video';
-const OUTPUT_FILE = 'output.mp3';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 const JSON_FILE = 'transcriptions.json';
 const QA_FILE = 'qa.json';
+const MAX_TOKENS = 1000;
+const TMP_DOWNLOADS = './tmp_downloads';
+
+const CHUNK_SUMMARIZATION = false;
 
 if (!YOUTUBE_URL) {
   console.error('Please provide a YouTube URL as a command-line argument.');
@@ -31,22 +36,32 @@ const videoId = new URL(YOUTUBE_URL).searchParams.get('v');
 async function download(url) {
   try {
     // Download and convert YouTube video to MP3
+    if (!fs.existsSync(TMP_DOWNLOADS)) {
+      fs.mkdirSync(TMP_DOWNLOADS);
+    }
+    const audioPath = path.join(TMP_DOWNLOADS, `${videoId}.mp3`);
+    if (fs.existsSync(audioPath)) {
+      console.log('Audio already exists, skipping download');
+      return audioPath;
+    }
     console.log('Downloading YouTube video...');
+
     await new Promise((resolve, reject) => {
       const videoStream = ytdl(url, { quality: 'lowestaudio', filter: 'audioonly' });
       const converter = ffmpeg(videoStream)
         .format('mp3')
         .on('error', reject)
         .on('end', resolve)
-        .save(OUTPUT_FILE);
+        .save(audioPath);
     });
     console.log('YouTube video downloaded and converted to MP3.');
+    return audioPath
   } catch (error) {
     console.error(error);
   }
 }
 
-async function splitFile(inputFile, maxChunkSize, outputDir) {
+async function splitAudioFile(inputFile, maxChunkSize, outputDir) {
   try {
     const { size } = fs.statSync(inputFile);
     const maxChunkSizeBytes = maxChunkSize;
@@ -96,7 +111,7 @@ async function splitFile(inputFile, maxChunkSize, outputDir) {
 // Function to split a file and upload the chunks to the OpenAI API for transcription
 async function splitAndUpload(inputFile, maxChunkSize) {
   try {
-    const files = await splitFile(inputFile, maxChunkSize, '.');
+    const files = await splitAudioFile(inputFile, maxChunkSize, '.');
 
     // console.log(files);
 
@@ -140,17 +155,16 @@ async function uploadFileAndTranscribe(fileBuffer) {
   }
 }
 
-async function saveTranscription(id, transcript) {
+async function saveTranscription(id, transcript, tokenCount, summarizedChunks) {
   console.log('Saving transcription to file...');
   let transcriptions = {};
 
   if (fs.existsSync(JSON_FILE)) {
     const fileContent = fs.readFileSync(JSON_FILE, 'utf-8');
-
     transcriptions = JSON.parse(fileContent);
   }
 
-  transcriptions[id] = transcript;
+  transcriptions[id] = { transcript, tokenCount, summarizedChunks };
   fs.writeFileSync(JSON_FILE, JSON.stringify(transcriptions, null, 2));
 }
 
@@ -169,7 +183,7 @@ async function getTranscription(id) {
 }
 
 async function askGPT4(transcript, question) {
-  console.log(`Asking GPT-4: ${question}`);
+  console.log(`Asking GPT-4: ${question} for transcript: ${transcript}`);
   try {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
@@ -233,35 +247,66 @@ async function findExistingAnswer(id, question) {
     return exists.answer;
   }
   return null;
-  // const prompt = `
-  // Can this question be answered by these questions and answers?
-  // Please answer with a 'yes' or 'no'.
-  // ---
-  // Question: ${question}
-  // ---
-  // Questions and answers:
-  // ` + existingQA.map((qa) => `Q: ${qa.question} A: ${qa.answer}`).join('');
-  // const response = await askGPT4(prompt, question);
-  // console.log(response)
-  // process.exit()
-  // if (response.toLowerCase() === 'yes') {
-  //   return qa.answer;
-  // }
+}
+
+async function splitTranscript(transcript, maxTokens) {
+  const tokens = encode(transcript);
+  const chunks = [];
+
+  for (let i = 0; i < tokens.length;) {
+    let end = i + maxTokens;
+    while (end < tokens.length && tokens[end] !== encode('. ')[0]) {
+      end--;
+    }
+    if (end >= tokens.length) {
+      end = tokens.length - 1;
+    } else {
+      end++; // To include the full stop in the chunk
+    }
+
+    const chunkTokens = tokens.slice(i, end);
+    const chunkText = decode(chunkTokens);
+    chunks.push(chunkText);
+    i = end;
+  }
+
+  return chunks;
 }
 
 const run = async () => {
-  let transcript = await getTranscription(videoId);
+  let transcriptData = await getTranscription(videoId);
 
-  if (!transcript) {
-    await download(YOUTUBE_URL);
-    transcript = await splitAndUpload(OUTPUT_FILE, MAX_FILE_SIZE);
-    saveTranscription(videoId, transcript);
+  if (!transcriptData) {
+    const audioFile = await download(YOUTUBE_URL);
+    const fullTranscript = await splitAndUpload(audioFile, MAX_FILE_SIZE);
+    const tokenCount = encode(fullTranscript).length;
+
+    let summarizedChunks = [];
+    if (CHUNK_SUMMARIZATION && tokenCount > MAX_TOKENS) {
+      const chunks = await splitTranscript(fullTranscript, MAX_TOKENS);
+
+      for (const chunk of chunks) {
+        const summary = await askGPT4(chunk, 'Please summarize this text');
+        summarizedChunks.push(summary);
+      }
+    }
+
+    transcriptData = { transcript: fullTranscript, tokenCount, summarizedChunks };
+    saveTranscription(videoId, fullTranscript, tokenCount, summarizedChunks);
   }
+
+  const { transcript, tokenCount, summarizedChunks } = transcriptData;
 
   let answer = await findExistingAnswer(videoId, QUESTION);
 
   if (!answer) {
-    answer = await askGPT4(transcript, QUESTION);
+    if (summarizedChunks && summarizedChunks.length > 0) {
+      const summarizedTranscript = summarizedChunks.join(' ');
+      answer = await askGPT4(summarizedTranscript, QUESTION);
+    } else {
+      answer = await askGPT4(transcript, QUESTION);
+    }
+
     console.log('GPT-4 Response:', answer);
     saveQA(videoId, QUESTION, answer);
   } else {

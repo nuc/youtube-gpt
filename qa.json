@@ -1,34 +1,8 @@
 {
-  "HhSCMGdq11Y": [
-    {
-      "question": "Please summarize the contents of that video",
-      "answer": "The video is a \"Before You Buy\" review of The Last of Us Part 1 on PC. The reviewer, Jake, shares his first impressions and discusses the performance issues that many players have experienced with the game. He mentions that the game has received mostly negative reviews on Steam due to these issues.\n\nJake explains that despite meeting the recommended specs, they had a hard time getting the game to run smoothly at 1440p and close to 60 FPS. They encountered stuttering, inconsistent frame rates, and long load times. The game also takes up a significant amount of VRAM and has some strange default settings, such as an excessive film grain effect.\n\nThe Last of Us Part 1 on PC has a good amount of options and features, but it seems poorly optimized. Jake mentions that the community is working on homemade fixes, but he believes that the game should work properly without needing these fixes. He also briefly discusses the game's performance on the Steam Deck, which resulted in crashes.\n\nIn conclusion, Jake recommends waiting to purchase The Last of Us Part 1 on PC until the performance issues are resolved. He hopes that the game will eventually become a definitive version for PC players and that the community will be able to mod and enjoy the game as intended."
-    },
+  "-s_ABD7vvM4": [
     {
       "question": "Please summarize the video",
-      "answer": "The video is a \"Before You Buy\" first impressions review of The Last of Us Part 1 on PC. The reviewer, Jake, highlights that while the game is a classic and beloved title, the PC release has been plagued with performance issues, making it difficult to recommend at this time. Many users have experienced stuttering, crashes, and other technical problems, despite having powerful hardware. The game does have a good amount of options and features for a PC release, but it seems poorly optimized. Jake suggests waiting for patches or updates to fix these issues before purchasing the game, and encourages potential buyers to research other reviews and opinions before making a decision."
-    }
-  ],
-  "ylpAHvPlafc": [
-    {
-      "question": "Please summarize the video",
-      "answer": "In this video, the author teaches how to analyze and learn from your own chess games using computer analysis. He emphasizes focusing on the thought process and breaking the game down into phases: opening, middle game, and end game. The author analyzes three games, each played by different skill levels, and highlights the importance of understanding computer suggestions and applying practical knowledge to your own games.\n\nKey takeaways from the video include:\n\n1. Don't rely too heavily on computer evaluations in the opening phase, as they might not fully understand openings.\n2. Understand"
-    }
-  ],
-  "to78maCxFEs": [
-    {
-      "question": "Please summarize the video",
-      "answer": "In this video, Lex Fridman and Sam Altman discuss the potential of large language models like GPT-3 in achieving artificial general intelligence (AGI). They explore the idea that while GPT-3 has achieved impressive results, it may still require additional components or ideas to reach AGI. Sam Altman emphasizes that he would like to see a system that can significantly contribute to scientific knowledge and discovery.\n\nThey also discuss the impact of AI on programming and how it can make humans more productive, rather than replacing them. They touch on the idea that humans will still seek drama, imperfections, and status, even in a world where AI has greatly improved the quality of life."
-    }
-  ],
-  "3eEffbjzNwE": [
-    {
-      "question": "Please summarize the video",
-      "answer": "In the video, David Deutsch discusses the concept of explanation and its importance in understanding reality and the future of humanity. He differentiates between good explanations and bad explanations, stating that good explanations are hard to vary while still explaining what they purport to explain. Bad explanations, on the other hand, can be false or simply inadequate.\n\nDeutsch argues that reductionism, the idea that explanations must be built from the ground up, is a prejudice and that good explanations can come from different modes or levels of understanding. He also introduces the concept of bad philosophy, which is a subset of bad explanations that hinder the growth of knowledge by closing off certain areas of inquiry. Examples of bad philosophy include logical positivism and certain statistical analyses in physics.\n\nThe antidote to bad philosophy, according to Deutsch, is the quest for good explanations that apply across various fields, including science, philosophy, politics, and aesthetics. This principle allows for progress and the growth of knowledge."
-    },
-    {
-      "question": "Who is David Deutsch?",
-      "answer": "David Deutsch is a British physicist, philosopher, and author, born in 1953 in Haifa, Israel. He is best known for his pioneering work in the field of quantum computation and his contributions to the understanding of quantum mechanics. Deutsch is a visiting professor at the University of Oxford's Centre for Quantum Computation and a Fellow of the Royal Society.\n\nDeutsch has written two influential books, \"The Fabric of Reality\" (1997) and \"The Beginning of Infinity\" (2011), in which he explores the nature of reality, knowledge, and the potential for human progress. His work spans various disciplines, including physics, philosophy, computer science, and even biology, as he seeks to understand the fundamental principles that govern our universe and the growth of knowledge."
+      "answer": "The video features a 3-year-old Russian chess prodigy, Mikhail Osipov, who played against former World Chess Champion Anatoly Karpov on a television show. Despite making some mistakes, Osipov showcased impressive skills for his age. Karpov praised the young player's understanding and maturity. Osipov later returned to the show and successfully solved several complex chess puzzles, further demonstrating his exceptional talent."
     }
   ]
 }
