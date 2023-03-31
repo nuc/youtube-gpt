@@ -4,6 +4,8 @@ This is a fun and easy-to-use module that downloads and transcribes YouTube vide
 
 **Note**: This project uses the GPT-4 model, which requires access to that model through the OpenAI API. Make sure your OpenAI account has access to GPT-4 before using this project.
 
+**Created with the help of GPT-4**: The code and this README were generated also with the assistance of OpenAI's GPT-4 model.
+
 ## Features
 
 - Downloads YouTube videos and converts them to MP3
