@@ -27,7 +27,7 @@ if (!YOUTUBE_URL) {
 }
 
 if (!OPENAI_API_KEY) {
-  console.error('Please provide an OpenAI API key in the .env file.');
+  console.error('Please provide an OpenAI API key as an env var `OPENAI_API_KEY` (or in the .env file if you have cloned the repo).');
   process.exit(1);
 }
 
