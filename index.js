@@ -183,7 +183,7 @@ async function getTranscription(id) {
 }
 
 async function askGPT4(transcript, question) {
-  console.log(`Asking GPT-4: ${question} for transcript: ${transcript}`);
+  // console.log(`Asking GPT-4: ${question} for transcript: ${transcript}`);
   try {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
