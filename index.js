@@ -9,6 +9,7 @@ const fs = require('fs');
 const { Readable } = require('stream');
 const { encode, decode } = require('gpt-3-encoder');
 const path = require('path');
+const wordWrap = require('word-wrap');
 
 const YOUTUBE_URL = process.argv[2];
 const QUESTION = process.argv[3] || 'Please summarize the video';
@@ -18,6 +19,8 @@ const JSON_FILE = 'transcriptions.json';
 const QA_FILE = 'qa.json';
 const MAX_TOKENS = 1000;
 const TMP_DOWNLOADS = './tmp_downloads';
+
+const logger = (message) => process.env.DEBUG_LOGS && console.log(message)
 
 const CHUNK_SUMMARIZATION = false;
 
@@ -41,10 +44,10 @@ async function download(url) {
     }
     const audioPath = path.join(TMP_DOWNLOADS, `${videoId}.mp3`);
     if (fs.existsSync(audioPath)) {
-      console.log('Audio already exists, skipping download');
+      logger('Audio already exists, skipping download');
       return audioPath;
     }
-    console.log('Downloading YouTube video...');
+    logger('Downloading YouTube video...');
 
     await new Promise((resolve, reject) => {
       const videoStream = ytdl(url, { quality: 'lowestaudio', filter: 'audioonly' });
@@ -54,7 +57,7 @@ async function download(url) {
         .on('end', resolve)
         .save(audioPath);
     });
-    console.log('YouTube video downloaded and converted to MP3.');
+    logger('YouTube video downloaded and converted to MP3.');
     return audioPath
   } catch (error) {
     console.error(error);
@@ -78,7 +81,7 @@ async function splitAudioFile(inputFile, maxChunkSize, outputDir) {
     const chunkDuration = Math.floor((maxChunkSizeBytes / bitrate) * 1000) / 1000; // Duration in seconds
 
     const totalChunks = Math.ceil(duration / chunkDuration);
-    // console.log(`File size: ${size} bytes, Max chunk size: ${maxChunkSizeBytes} bytes, Total chunks: ${totalChunks}`);
+    // logger(`File size: ${size} bytes, Max chunk size: ${maxChunkSizeBytes} bytes, Total chunks: ${totalChunks}`);
 
     const outputFiles = [];
     let currentChunk = 1;
@@ -113,11 +116,11 @@ async function splitAndUpload(inputFile, maxChunkSize) {
   try {
     const files = await splitAudioFile(inputFile, maxChunkSize, '.');
 
-    // console.log(files);
+    // logger(files);
 
     let transcriptions = [];
     for (let i = 0; i < files.length; i++) {
-      console.log(`Uploading chunk ${i + 1} of ${files.length} to OpenAI...`);
+      logger(`Uploading chunk ${i + 1} of ${files.length} to OpenAI...`);
       const fileBuffer = fs.readFileSync(files[i]);
       const transcript = await uploadFileAndTranscribe(fileBuffer);
       transcriptions.push(transcript);
@@ -126,7 +129,7 @@ async function splitAndUpload(inputFile, maxChunkSize) {
       fs.unlinkSync(files[i]);
     }
 
-    console.log('All chunks uploaded to OpenAI.');
+    logger('All chunks uploaded to OpenAI.');
     return transcriptions.join(' ');
   } catch (error) {
     console.error(error);
@@ -148,7 +151,7 @@ async function uploadFileAndTranscribe(fileBuffer) {
     });
 
     const transcript = response.data.text;
-    // console.log('Transcription:', transcript);
+    // logger('Transcription:', transcript);
     return transcript;
   } catch (error) {
     console.error(error.response.data);
@@ -156,7 +159,7 @@ async function uploadFileAndTranscribe(fileBuffer) {
 }
 
 async function saveTranscription(id, transcript, tokenCount, summarizedChunks) {
-  console.log('Saving transcription to file...');
+  logger('Saving transcription to file...');
   let transcriptions = {};
 
   if (fs.existsSync(JSON_FILE)) {
@@ -174,7 +177,7 @@ async function getTranscription(id) {
     const transcriptions = JSON.parse(fileContent);
 
     if (transcriptions[id]) {
-      console.log('Transcription found in file.');
+      logger('Transcription found in file.');
       return transcriptions[id];
     }
   }
@@ -183,7 +186,7 @@ async function getTranscription(id) {
 }
 
 async function askGPT4(transcript, question) {
-  // console.log(`Asking GPT-4: ${question} for transcript: ${transcript}`);
+  // logger(`Asking GPT-4: ${question} for transcript: ${transcript}`);
   try {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
@@ -273,7 +276,19 @@ async function splitTranscript(transcript, maxTokens) {
   return chunks;
 }
 
+const logResponse = ({ YOUTUBE_URL, QUESTION, answer }) => {
+  const response = `---------------------------
+  QUESTION: ${QUESTION}
+  ---------------------------
+  ANSWER: ${answer}
+  `;
+  const wrappedResponse = wordWrap(response, { width: 80, indent: '  ' });
+  console.log(wrappedResponse);
+}
+
 const run = async () => {
+  console.log(`  --------------------------- `)
+  console.log('  Generating answers...');
   let transcriptData = await getTranscription(videoId);
 
   if (!transcriptData) {
@@ -282,7 +297,7 @@ const run = async () => {
     const tokenCount = encode(fullTranscript).length;
 
     if (tokenCount > 5000) {
-      console.log(`Transcript contains ${tokenCount} tokens. The output might be truncated.`);
+      logger(`Transcript contains ${tokenCount} tokens. The output might be truncated.`);
     }
 
     let summarizedChunks = [];
@@ -311,11 +326,12 @@ const run = async () => {
       answer = await askGPT4(transcript, QUESTION);
     }
 
-    console.log('GPT-4 Response:', answer);
+    logger('GPT-4 Response:', answer);
     saveQA(videoId, QUESTION, answer);
   } else {
-    console.log('Existing Answer:', answer);
+    logger('Existing Answer:', answer);
   }
+  logResponse({ YOUTUBE_URL, QUESTION, answer });
 };
 
 run();
