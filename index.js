@@ -22,7 +22,7 @@ const TMP_DOWNLOADS = './tmp_downloads';
 
 const logger = (message) => process.env.DEBUG_LOGS && console.log(message)
 
-const CHUNK_SUMMARIZATION = false;
+const CHUNK_SUMMARIZATION = true;
 
 if (!YOUTUBE_URL) {
   console.error('Please provide a YouTube URL as a command-line argument.');
