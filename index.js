@@ -262,20 +262,17 @@ async function splitTranscript(transcript, maxTokens) {
   const chunks = [];
 
   for (let i = 0; i < tokens.length;) {
-    let end = i + maxTokens;
-    while (end < tokens.length && tokens[end] !== encode('. ')[0]) {
+    let end = Math.min(i + maxTokens, tokens.length);
+    while (end > i && tokens[end - 1] !== encode('. ')[0]) {
       end--;
     }
-    if (end >= tokens.length) {
-      end = tokens.length - 1;
-    } else {
-      end++; // To include the full stop in the chunk
+    if (end <= i) {
+      end = Math.min(i + maxTokens, tokens.length); // Fallback if no full stop is found
     }
-
     const chunkTokens = tokens.slice(i, end);
     const chunkText = decode(chunkTokens);
     chunks.push(chunkText);
-    i = end;
+    i = end + 1;
   }
 
   return chunks;
